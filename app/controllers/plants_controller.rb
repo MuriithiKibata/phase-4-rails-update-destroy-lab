@@ -1,5 +1,5 @@
 class PlantsController < ApplicationController
-
+# rescue_from ActiveRecord::RecordNotFound, with: render_not_found_response
   # GET /plants
   def index
     plants = Plant.all
@@ -18,9 +18,29 @@ class PlantsController < ApplicationController
     render json: plant, status: :created
   end
 
+  def update
+    plant = find_by_id
+    plant.update(plant_params)
+    render json: plant
+  end
+
+  def destroy
+    plant = find_by_id
+    plant.destroy
+    head :no_content
+  end
+
   private
 
   def plant_params
     params.permit(:name, :image, :price, :is_in_stock)
+  end
+
+  def find_by_id
+    Plant.find(params[:id])
+  end
+
+  def render_not_found_response
+    render json: {error: "Plant Not Found"}, status: :not_found
   end
 end
